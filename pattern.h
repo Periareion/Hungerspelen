@@ -16,7 +16,7 @@ struct Pattern {
   Instruction* instruction_array_pointer;
   int pattern_length;
 
-  Pattern(Instruction* arr_ptr, int len) : instruction_array_pointer(arr_ptr), pattern_length(len) {}
+  Pattern(Instruction* arr_ptr = NULL, int len = 0) : instruction_array_pointer(arr_ptr), pattern_length(len) {}
 };
 
 #endif

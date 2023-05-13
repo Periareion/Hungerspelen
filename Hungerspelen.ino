@@ -1,7 +1,7 @@
-// Kod skriven av Anton Oresten Sollman (GPT-4 hjälpte mig förstå pointers och annat)
-// Del av "Hungerspelen", ett projekt med Manda Rosenberg och Sedra Fares
-// Naturvetenskaplig Specialisering NA20
-// Maj 2023
+/* Kod skriven av Anton Oresten Sollman (GPT-4 hjälpte med att förstå pointers och annat)
+   Del av "Hungerspelen", med Manda Rosenberg och Sedra Fares
+   Naturvetenskaplig Specialisering NA20
+   Maj 2023 */
 
 // Ett bibliotek som används för att styra motorerna. Se https://learn.sparkfun.com/tutorials/tb6612fng-hookup-guide#introduction
 #include <SparkFun_TB6612.h>
@@ -11,13 +11,8 @@
 
 // Varje direction får ett eget nummer så att de kan urskiljas.
 // enum betyder enumerate
-enum Directions {
-  NOTHING, // 0
-  FORWARD, // 1
-  REVERSE, // 2
-  LEFT,    // 3
-  RIGHT,   // 4
-};
+enum Directions {NOTHING, FORWARD, REVERSE, LEFT, RIGHT};
+//                  0        1        2      3      4
 
 // Skapar en instruktion där svängningsgraden kan justeras
 Instruction Turn(
@@ -55,10 +50,10 @@ Instruction Brake(int duration = 1000) {
   return Drive(NOTHING, duration);
 }
 
-/* WELCOME TO THE FUN ZONE */
+/************** WELCOME TO THE FUN ZONE ****************/
+/* I "THE FUN ZONE" kan ni redigera hur mycket ni vill */
 
 Instruction the_snake[] = {
-  Drive(FORWARD, 1000),
   Turn(RIGHT, 1000, 0.4),
   Turn(LEFT, 1000, 0.4),
 };
@@ -67,34 +62,38 @@ Pattern patterns[] = {
   Pattern(the_snake, 3),
 };
 
-// Denna funktion gör att det blir slumpmässigt vilket håll den backar.
-// random(2)+3 kommer bli antingen RIGHT (3) eller LEFT (4) enligt "enum Directions"
+/* Denna funktion gör att det blir slumpmässigt vilket håll den backar.
+   random(2)+3 kommer bli antingen RIGHT (3) eller LEFT (4) enligt "enum Directions" */
 Instruction go_back() {
   return Turn(random(2)+3, 2000, 1.0, true);
 }
 
-/*****   THE NO-NO ZONE   *****/
-/***** Danger - Keep Away *****/
+/*********   END OF THE FUN ZONE   ********/
+/*****   THE NO-NO ZONE STARTS HERE   *****/
+/*******     Danger - Keep Away     *******/
 
-// long kan hålla 25 dagar värt av millisekunder
-// unsigned long kan hålla 50 dagar, men blir problematisk vid subtraktion
-long arena_timespan = 1000L*60*2; // Suffixen 'L' ser till att produkten blir en long (32 bit)
+/* long kan hålla 25 dagar värt av millisekunder
+   unsigned long kan hålla 50 dagar, men blir problematisk vid subtraktion
+   Suffixen 'L' ser till att produkten blir en long (32 bit) */
+long arena_timespan = 1000L*60*2;
 
-Instruction* instruction_pointer; // Håller koll på nuvarande instruktion
-long instruction_start_time; // Tiden då nuvarande instruktion började
-long instruction_duration; // Hur länge en instruktion håller på
-int instruction_index; // Index av nuvarande instruktion i nuvarande mönstrets instruktion array
+/* Håller koll på nuvarande instruktion */
+Instruction* instruction_pointer; 
+long instruction_start_time;
+long instruction_duration;
+int instruction_index;
 
-Pattern* pattern_pointer; // Håller koll på nuvarande mönster
-int pattern_length; // Antal instruktioner i nuvarande pattern
-int pattern_index = 0; // Index av nuvarande mönster i mönster-arrayen
-int pattern_count = sizeof(patterns) / sizeof(Pattern); // Antalet mönster i mönster-arrayen
+/* Håller koll på nuvarande mönster */
+Pattern* pattern_pointer;
+int pattern_length;
+int pattern_index = 0;
+int pattern_count = sizeof(patterns) / sizeof(Pattern);
 
-// En array som gör det möjligt att konvertera en instruktion till ett mönster 
+/* En array som gör det möjligt att konvertera en instruktion till ett mönster */
 Instruction single_instruction_array[1];
 
-// Konverterar en enda instruktion till ett mönster med den instruktionen
-// Används för att go_back ska kunna vara random
+/* Konverterar en enda instruktion till ett mönster med den instruktionen
+   Används för att go_back ska kunna vara random */
 Pattern InstructionToPattern(Instruction instruction) {
   single_instruction_array[0] = instruction;
   Pattern pattern = Pattern(single_instruction_array, 1);
@@ -120,9 +119,9 @@ int food_counter;
 
 const int offsetA = 1;
 const int offsetB = 1;
-const int MOTOR_SPEED = 150; // Motorernas grundhastighet
+const int MOTOR_SPEED = 140; // Motorernas grundhastighet
 const int STEERING_COEF = 50; // En konstant som påverkar hur skarpa svängarna blir. Multipliceras med Turn-funktionens turn_factor.
-const int SENSOR_THRESHOLD = 500; // Det sensor-värde som skiljer på mat och inte mat
+const int SENSOR_THRESHOLD = 950; // Det sensor-värde som skiljer på mat och inte mat
 
 // Används vid direkt kontroll av motorerna
 int base_speed;
@@ -194,8 +193,8 @@ void checkSensor() {
 }
 
 void doTimeOut() {
-  execute(Brake());
-  setRGB(HIGH, HIGH, HIGH);
+  executeInstruction(Brake());
+  setRGB(LOW, LOW, HIGH);
   Serial.print("Time is up! Seconds passed: "); Serial.println((current_time - arena_start_time) / 1000);
   Serial.print("Score: "); Serial.println(food_counter);
   delay(60000);
@@ -213,13 +212,13 @@ void eatFood() {
   setRGB(LOW, HIGH, LOW); // Quettazillatron is a herbivore, hence the green light
   food_counter++;
   Serial.print("Mat: "); Serial.println(food_counter);
-  execute(Brake());
+  executeInstruction(Brake());
   delay(2000);
   resumeInstruction();
   delay(1000); // Ser till att maten inte äts igen
 }
 
-void execute(Instruction instruction) {
+void executeInstruction(Instruction instruction) {
   base_speed = instruction.speed_factor*MOTOR_SPEED;
   steer_term = instruction.speed_factor*STEERING_COEF*instruction.turn_factor;
   left_motor.drive(base_speed - steer_term);
@@ -245,8 +244,8 @@ void setPattern(Pattern* pattern_ptr) {
 }
 
 void resumeInstruction() {
-  execute(*instruction_pointer);
-  instruction_start_time = millis();
+  executeInstruction(*instruction_pointer);
+  // instruction_start_time = millis();
 }
 
 void checkInstructions() {
@@ -266,5 +265,5 @@ void checkInstructions() {
     }
   }
 
-  execute(*instruction_pointer);
+  executeInstruction(*instruction_pointer);
 }
