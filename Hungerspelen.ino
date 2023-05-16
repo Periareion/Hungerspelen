@@ -9,12 +9,14 @@
 // Innehåller Instruction och Pattern structs
 #include "pattern.h"
 
-// Varje direction får ett eget nummer så att de kan urskiljas.
-// enum betyder enumerate
-enum Directions {NOTHING, FORWARD, REVERSE, LEFT, RIGHT};
-//                  0        1        2      3      4
+/* enum betyder enumerate. Varje riktning får ett eget nummer så de kan urskiljas:
+                    0        1        2      3      4   */
+enum Directions {NOTHING, FORWARD, BACKWARD, LEFT, RIGHT};
 
-// Skapar en instruktion där svängningsgraden kan justeras
+/* Skapar en instruktion
+   Gjord för att svänga
+   Med argumentet 'turn_factor' så kan svängningsgraden justeras
+   Med argumentet 'reverse' så kan man svänga baklänges */
 Instruction Turn(
   int turn_direction = RIGHT,
   int duration = 1000,
@@ -26,7 +28,7 @@ Instruction Turn(
   switch(turn_direction) {
     case FORWARD:
       return Instruction(reverse_coef*1.0, 0.0, duration);
-    case REVERSE:
+    case BACKWARD:
       return Instruction(reverse_coef*(-1.0), 0.0, duration);
     case LEFT:
       return Instruction(reverse_coef*1.0, -turn_factor, duration);
@@ -37,13 +39,13 @@ Instruction Turn(
   }
 }
 
-// Skapar en instruktion
+/* Skapar en instruktion
+   Gjord för FORWARD/BACKWARD */
 Instruction Drive(
   int drive_direction = FORWARD,
-  int duration = 1000,
-  bool reverse = false
+  int duration = 1000
 ) {
-  return Turn(drive_direction, duration, 0.0, reverse);
+  return Turn(drive_direction, duration, 0.0, false);
 }
 
 Instruction Brake(int duration = 1000) {
@@ -53,14 +55,34 @@ Instruction Brake(int duration = 1000) {
 /************** WELCOME TO THE FUN ZONE ****************/
 /* I "THE FUN ZONE" kan ni redigera hur mycket ni vill */
 
-Instruction the_snake[] = {
-  Turn(RIGHT, 1000, 0.4),
-  Turn(LEFT, 1000, 0.4),
+// Skapa ett nytt mönster genom att först skapa en array med instruktioner
+Instruction example[] = {
+  Drive(FORWARD, 1000),        // Kör framåt i 1000 millisekunder  
+  Drive(BACKWARD, 1000),       // Kör bakåt i 1000 millisekunder
+  Turn(RIGHT, 500, 1.0),       // Sväng höger i 500 millisekunder
+  Turn(RIGHT, 500, 1.0, true), // Samma fast baklänges baklänges
+  Turn(LEFT, 3000, 0.2),       // Sväng vänster i 3000 millisekunder, med svängningsfaktorn 0.2
+  Brake(1000),                 // Stanna i 1000 millisekunder
 };
 
-Pattern patterns[] = {
-  Pattern(the_snake, 3),
+// Rörelsen liknar en orm
+Instruction the_snake[] = {
+  Turn(RIGHT, 800, 0.4),
+  Turn(LEFT, 800, 0.4),
+  Turn(RIGHT, 800, 0.4),
+  Turn(LEFT, 800, 0.4),
+  Turn(RIGHT, 800, 0.4),
+  Turn(LEFT, 800, 0.4),
 };
+
+// En array med mönster som kommer loopas igenom om och om igen.
+// Skapa en "Pattern" genom att ange instruktion-array och hur många instruktioner som ska användas.
+Pattern patterns[] = {
+  Pattern(example, 5), // De första 5 instruktionerna kommer köras (alla utom Brake)
+  Pattern(the_snake, 6), // Alla 6 instruktioner kommer köras
+};
+/* Antal instruktioner behöver anges manuellt på grund av hur C++ hanterar "listor". 
+   Det går inte att veta */
 
 /* Denna funktion gör att det blir slumpmässigt vilket håll den backar.
    random(2)+3 kommer bli antingen RIGHT (3) eller LEFT (4) enligt "enum Directions" */
@@ -216,17 +238,15 @@ void eatFood() {
   delay(2000);
   resumeInstruction();
   delay(1000); // Ser till att maten inte äts igen
+  // Skulle istället kunna skapa en variabel last_food_time och en konstant FOOD_COOLDOWN och använda de i checkSensor
 }
 
 void executeInstruction(Instruction instruction) {
   base_speed = instruction.speed_factor*MOTOR_SPEED;
   steer_term = instruction.speed_factor*STEERING_COEF*instruction.turn_factor;
+  
   left_motor.drive(base_speed - steer_term);
   right_motor.drive(base_speed + steer_term);
-  /*Serial.print("Executing ");
-  Serial.print(instruction.speed_factor); Serial.print(",");
-  Serial.print(instruction.turn_factor); Serial.print(",");
-  Serial.println(instruction.duration);*/
 }
 
 void beginNextInstruction() {
@@ -267,3 +287,8 @@ void checkInstructions() {
 
   executeInstruction(*instruction_pointer);
 }
+
+/* UTMANING: Kan du modifiera andra delar av koden så att den alltid
+ *  åker fram och tillbaka efter att den har hittat mat?
+ *  På så sätt äter den samma om och om igen! hehe
+ *  Idé: Aktivera ett mönster när eatFood körs! */
