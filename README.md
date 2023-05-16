@@ -28,8 +28,8 @@ Instruction the_snake[] = {
 // En array med mönster som kommer loopas igenom om och om igen.
 // Skapa en "Pattern" genom att ange instruktion-array och hur många instruktioner som ska användas.
 Pattern patterns[] = {
-  Pattern(example, 6), // 6 
-  Pattern(the_snake, 5), // 5 instruktioner kommer köras
+  Pattern(example, 5), // De första 5 instruktionerna kommer köras (alla utom Brake)
+  Pattern(the_snake, 6), // Alla 6 instruktioner kommer köras
 };
 /* Antal instruktioner behöver anges manuellt på grund av hur C++ hanterar "listor". 
    Det går inte att veta */
