@@ -81,8 +81,7 @@ Pattern patterns[] = {
   Pattern(example, 5), // De första 5 instruktionerna kommer köras (alla utom Brake)
   Pattern(the_snake, 6), // Alla 6 instruktioner kommer köras
 };
-/* Antal instruktioner behöver anges manuellt på grund av hur C++ hanterar "listor". 
-   Det går inte att veta */
+/* Antalet instruktioner behöver anges manuellt på grund av hur arrays fungerar */
 
 /* Denna funktion gör att det blir slumpmässigt vilket håll den backar.
    random(2)+3 kommer bli antingen RIGHT (3) eller LEFT (4) enligt "enum Directions" */
@@ -238,7 +237,7 @@ void eatFood() {
   delay(2000);
   resumeInstruction();
   delay(1000); // Ser till att maten inte äts igen
-  // Skulle istället kunna skapa en variabel last_food_time och en konstant FOOD_COOLDOWN och använda de i checkSensor
+  // Skulle istället kunna skapa en variabel last_food_time och en konstant FOOD_COOLDOWN för att användas i checkSensor
 }
 
 void executeInstruction(Instruction instruction) {
@@ -290,5 +289,4 @@ void checkInstructions() {
 
 /* UTMANING: Kan du modifiera andra delar av koden så att den alltid
  *  åker fram och tillbaka efter att den har hittat mat?
- *  På så sätt äter den samma om och om igen! hehe
- *  Idé: Aktivera ett mönster när eatFood körs! */
+ *  På så sätt kommer den äta samma mat om och om igen! hehe */
