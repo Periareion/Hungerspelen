@@ -15,7 +15,7 @@ Instruction example[] = {
   Brake(1000),                 // Stanna i 1000 millisekunder
 };
 
-// Rörelsen liknar en orm
+// Denna array av instruktioner skapar en rörelsen som liknar en rörelsen av en orm
 Instruction the_snake[] = {
   Turn(RIGHT, 800, 0.4),
   Turn(LEFT, 800, 0.4),
