@@ -1,8 +1,10 @@
 # Hungerspelen
  
-På den här sidan finns koden för att kontrollera er robot.
+För att kontrollera er robot så behöver ni filerna 'Hungerspelen.ino' och 'pattern.h'. Lägg filerna i en mapp som heter 'Hungerspelen'.
 
-## Skapa egna instruktioner
+## Skapa egna instruktioner och mönster
+
+Nedan finner ni en del av Hungerspelen.ino, och en förklaring till hur ni skapar egna mönster.
 
 ```ino
 // Skapa ett nytt mönster genom att först skapa en array med instruktioner
@@ -31,6 +33,5 @@ Pattern patterns[] = {
   Pattern(example, 5), // De första 5 instruktionerna kommer köras (alla utom Brake)
   Pattern(the_snake, 6), // Alla 6 instruktioner kommer köras
 };
-/* Antal instruktioner behöver anges manuellt på grund av hur C++ hanterar "listor". 
-   Det går inte att veta */
+/* Antalet instruktioner behöver anges manuellt på grund av hur arrays fungerar */
 ```
