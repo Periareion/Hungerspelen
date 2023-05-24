@@ -1,4 +1,4 @@
-/* Kod skriven av Anton Oresten Sollman (GPT-4 hjälpte med att förstå pointers och annat)
+/* Kod skriven av Anton Oresten Sollman (GPT-4 lärde mig om pointers)
    Del av "Hungerspelen", med Manda Rosenberg och Sedra Fares
    Naturvetenskaplig Specialisering NA20
    Maj 2023 */
