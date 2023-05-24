@@ -81,8 +81,7 @@ Pattern patterns[] = {
   Pattern(example, 5), // De första 5 instruktionerna kommer köras (alla utom Brake)
   Pattern(the_snake, 6), // Alla 6 instruktioner kommer köras
 };
-/* Antal instruktioner behöver anges manuellt på grund av hur C++ hanterar "listor". 
-   Det går inte att veta */
+/* Antalet instruktioner behöver anges manuellt på grund av hur arrays fungerar */
 
 /* Denna funktion gör att det blir slumpmässigt vilket håll den backar.
    random(2)+3 kommer bli antingen RIGHT (3) eller LEFT (4) enligt "enum Directions" */
@@ -139,15 +138,16 @@ const int SENSOR_PIN = A0; // infrared sensor pin number
 int sensor_value;
 int food_counter;
 
-const int offsetA = 1;
-const int offsetB = 1;
+// Används vid direkt kontroll av motorerna
+int base_speed;
+int steer_term;
+
 const int MOTOR_SPEED = 140; // Motorernas grundhastighet
 const int STEERING_COEF = 50; // En konstant som påverkar hur skarpa svängarna blir. Multipliceras med Turn-funktionens turn_factor.
 const int SENSOR_THRESHOLD = 950; // Det sensor-värde som skiljer på mat och inte mat
 
-// Används vid direkt kontroll av motorerna
-int base_speed;
-int steer_term;
+const int offsetA = 1;
+const int offsetB = 1;
 
 #define STBY 5
 #define AIN1 6
@@ -163,6 +163,7 @@ Motor right_motor = Motor(BIN1, BIN2, PWMB, offsetB, STBY);
 void initializeArena() {
   food_counter = 0;
   arena_start_time = millis();
+  clearPattern();
 }
 
 void setup() {
@@ -172,7 +173,6 @@ void setup() {
   pinMode(BLUE_LED, OUTPUT);
   randomSeed(analogRead(A3));
   Serial.begin(9600);
-  Serial.println(arena_timespan);
   setup_time = millis();
   current_time = setup_time;
   initializeArena();
@@ -210,6 +210,7 @@ void checkAntenna() {
 void checkSensor() {
   sensor_value = analogRead(SENSOR_PIN);
   if (sensor_value > SENSOR_THRESHOLD) {
+    Serial.println("");
     eatFood();
   }
 }
@@ -217,8 +218,8 @@ void checkSensor() {
 void doTimeOut() {
   executeInstruction(Brake());
   setRGB(LOW, LOW, HIGH);
-  Serial.print("Time is up! Seconds passed: "); Serial.println((current_time - arena_start_time) / 1000);
-  Serial.print("Score: "); Serial.println(food_counter);
+  Serial.print("Tiden är ute! Tid sen start: "); Serial.println((current_time - arena_start_time) / 1000);
+  Serial.print("Mat: "); Serial.println(food_counter);
   delay(60000);
   initializeArena();
 }
@@ -238,7 +239,7 @@ void eatFood() {
   delay(2000);
   resumeInstruction();
   delay(1000); // Ser till att maten inte äts igen
-  // Skulle istället kunna skapa en variabel last_food_time och en konstant FOOD_COOLDOWN och använda de i checkSensor
+  // Skulle istället kunna skapa en variabel last_food_time och en konstant FOOD_COOLDOWN för att användas i checkSensor
 }
 
 void executeInstruction(Instruction instruction) {
@@ -263,9 +264,12 @@ void setPattern(Pattern* pattern_ptr) {
   beginNextInstruction();
 }
 
+void clearPattern() {
+  pattern_pointer = NULL;
+}
+
 void resumeInstruction() {
   executeInstruction(*instruction_pointer);
-  // instruction_start_time = millis();
 }
 
 void checkInstructions() {
@@ -279,8 +283,7 @@ void checkInstructions() {
       beginNextInstruction();
     }
     else {
-      instruction_pointer = NULL;
-      pattern_pointer = NULL;
+      clearPattern();
       return;
     }
   }
@@ -289,6 +292,4 @@ void checkInstructions() {
 }
 
 /* UTMANING: Kan du modifiera andra delar av koden så att den alltid
- *  åker fram och tillbaka efter att den har hittat mat?
- *  På så sätt äter den samma om och om igen! hehe
- *  Idé: Aktivera ett mönster när eatFood körs! */
+ *  äter samma mat om och om igen? hehe */
