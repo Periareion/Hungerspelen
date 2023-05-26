@@ -1,6 +1,6 @@
 # Hungerspelen
  
-För att kontrollera er robot så behöver ni filerna 'Hungerspelen.ino' och 'pattern.h'. Lägg filerna i en mapp som heter 'Hungerspelen'.
+För att kontrollera er robot så behöver ni filerna 'Hungerspelen.ino' och 'pattern.h'. Lägg filerna i en mapp som ni döper till 'Hungerspelen'.
 
 ## Skapa egna instruktioner och mönster
 
