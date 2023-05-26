@@ -78,7 +78,7 @@ Instruction the_snake[] = {
 // En array med mönster som kommer loopas igenom om och om igen.
 // Skapa en "Pattern" genom att ange instruktion-array och hur många instruktioner som ska användas.
 Pattern patterns[] = {
-  Pattern(example, 5), // De första 5 instruktionerna kommer köras (alla utom Brake)
+  //Pattern(example, 5), // De första 5 instruktionerna kommer köras (alla utom Brake)
   Pattern(the_snake, 6), // Alla 6 instruktioner kommer köras
 };
 /* Antalet instruktioner behöver anges manuellt på grund av hur arrays fungerar */
@@ -144,7 +144,7 @@ int steer_term;
 
 const int MOTOR_SPEED = 140; // Motorernas grundhastighet
 const int STEERING_COEF = 50; // En konstant som påverkar hur skarpa svängarna blir. Multipliceras med Turn-funktionens turn_factor.
-const int SENSOR_THRESHOLD = 950; // Det sensor-värde som skiljer på mat och inte mat
+const int SENSOR_THRESHOLD = 500; // Det sensor-värde som skiljer på mat och inte mat
 
 const int offsetA = 1;
 const int offsetB = 1;
@@ -210,7 +210,6 @@ void checkAntenna() {
 void checkSensor() {
   sensor_value = analogRead(SENSOR_PIN);
   if (sensor_value > SENSOR_THRESHOLD) {
-    Serial.println("");
     eatFood();
   }
 }
